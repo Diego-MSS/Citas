@@ -18,22 +18,30 @@ switch($uri){
         require VIEWS_PATH. '/landing.php';
         break;
     case '/login':
+        //Vista del login de la app
             $controller = new AuthController();
             $controller->loginForm();
         break;
     case '/registrar':
+        //Vista de la pagina de registrar de la app
             $controller = new AuthController();
             $controller->registerForm();
         break;
     case '/agenda':
+        //Vista de la agenda de la app. Requiere loguearse para verla
         requireLogin();
         $controller = new CitasController();
         $controller -> index();
         break;
     case '/perfil':
+        //Vista del perfil de cada persona que 
         requireLogin();
+        $id = $_SESSION['usuario_id'];
         $controller = new AuthController();
-        $controller -> perfil();
+        $controller -> perfil($id);
+        break;
+    case '/buscar':
+        require VIEWS_PATH. '/buscar.php';
         break;
     
 }
