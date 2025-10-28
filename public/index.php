@@ -41,6 +41,7 @@ switch($uri){
         $controller -> perfil($id);
         break;
     case '/buscar':
+        //Vista de la pagina que utilizaran las personas para ver sus citas sin estar logueadas
         require VIEWS_PATH. '/buscar.php';
         break;
     
