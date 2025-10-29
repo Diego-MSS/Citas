@@ -17,10 +17,10 @@
         <?php else: ?>
             <?php foreach($citas as $cita): ?>
                 <tr>
-                    <td><?= htmlspecialchars(substr($c['hora'], 0, 5)) ?></td>
-                    <td><?= htmlspecialchars(date('d/m/Y', strtotime($c['fecha']))) ?></td>
-                    <td><?= htmlspecialchars($c['asunto']) ?></td>
-                    <td><?= htmlspecialchars($c['estado']) ?></td>
+                    <td><?= htmlspecialchars(substr($cita['hora'], 0, 5)) ?></td>
+                    <td><?= htmlspecialchars(date('d/m/Y', strtotime($cita['fecha']))) ?></td>
+                    <td><?= htmlspecialchars($cita['asunto']) ?></td>
+                    <td><?= htmlspecialchars($cita['estado']) ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>

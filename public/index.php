@@ -1,8 +1,12 @@
 <?php
-require 'CITAS/config/db.php';
-require 'CITAS/Controladores';
+define('BASE_PATH', dirname(__DIR__));
 
-define('VIEWS_PATH',__DIR__.'/CITAS/Vitas');
+require_once BASE_PATH . '\config\db.php';
+require_once BASE_PATH . '\Controladores\AuthController.php';
+require_once BASE_PATH . '\Controladores\CitasController.php';
+
+define('VIEWS_PATH',BASE_PATH . '\Vistas');
+
 session_start();
 function requireLogin(){
     if(!isset($_SESSION['usuario_id'])){
@@ -15,7 +19,7 @@ $uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 switch($uri){
     case'/':
         //Vista de la pagina principal, como se hace ya que no necesito ningun controlador para hacer una landing page
-        require VIEWS_PATH. '/landing.php';
+        require VIEWS_PATH. '\landing.php';
         break;
     case '/login':
         //Vista del login de la app
