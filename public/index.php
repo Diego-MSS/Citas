@@ -44,5 +44,10 @@ switch($uri){
         //Vista de la pagina que utilizaran las personas para ver sus citas sin estar logueadas
         require VIEWS_PATH. '/buscar.php';
         break;
+    case '/citas':
+        requireLogin();
+        $id = $_SESSION['usuario_id'];
+        $controller = new CitasController();
+        $controller -> citas($id);
     
 }
