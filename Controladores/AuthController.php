@@ -44,4 +44,32 @@ class AuthController{
         $title = 'Crear cuenta';
         include VIEWS_PATH . '\registrar.php';
     }
+    public function loginForm(){
+        $db = DB::getInstance();
+        $errores = [];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $login = trim($_POST['email'] ?? '');
+            $pass = trim($_POST['pass'] ?? '');
+
+            if ($login === '' || $pass === ''){
+                $errores[] = 'Debe rellenar todos los campos';
+            }
+            if(!filter_var($login,FILTER_VALIDATE_EMAIL)){
+                $errores[]="El email no es valido.";
+            }
+            $stmt=$db->prepare("SELECT id, login, pass FROM usuario where login = :email");
+            $stmt->execute([':email'=> $login]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($usuario && password_verify($pass, $usuario['pass'])){
+                $_SESSION['usuario_id'] = $usuario['id'];
+                $_SESSION['usuario_nombre'] = $usuario['nombre'];
+
+                header('/agenda');
+                exit;
+            }
+        }
+        $title = 'Login';
+        include VIEWS_PATH . '\login.php';
+    }
 }
