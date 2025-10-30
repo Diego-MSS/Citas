@@ -53,5 +53,25 @@ switch($uri){
         $id = $_SESSION['usuario_id'];
         $controller = new CitasController();
         $controller -> citas($id);
-    
+        break;
+    case '/logout':
+        session_start();
+        session_unset();
+        session_destroy();
+        header('Location: /');
+        exit;
+    case '/api/slots':
+        requireLogin();
+        $fechas = new CitasController();
+        $fechas->slotsJson();
+        break;
+    case '/citas/nueva':
+        requireLogin();
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $citas = new CitasController();
+            $citas -> crear();
+        }else{
+            header('Location: /agenda');exit;
+        }
+        break;
 }

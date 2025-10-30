@@ -58,18 +58,18 @@ class AuthController{
             if(!filter_var($login,FILTER_VALIDATE_EMAIL)){
                 $errores[]="El email no es valido.";
             }
-            $stmt=$db->prepare("SELECT id, login, pass FROM usuario where login = :email");
+            $stmt=$db->prepare("SELECT * FROM usuario where login = :email");
             $stmt->execute([':email'=> $login]);
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($usuario && password_verify($pass, $usuario['pass'])){
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
 
-                header('/agenda');
+                header('Location: /agenda');
                 exit;
             }
         }
         $title = 'Login';
-        include VIEWS_PATH . '\login.php';
+        include VIEWS_PATH . '/login.php';
     }
 }

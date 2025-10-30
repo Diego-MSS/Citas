@@ -1,5 +1,5 @@
 <?php ob_start() ?>
- <h1 class="mb-4">Log in</h1>
+ <h1 class="mb-4 text-center">Log in</h1>
  <?php if(!empty($errores)): ?>
     <div class="alert alert-danger">
         <ul>
