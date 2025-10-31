@@ -3,7 +3,18 @@ require_once __DIR__ . '/../Modelos/CitasModel.php';
 
 class CitasController{
     public function index(){
-
+      $uid = $_SESSION['usuario_id'];
+      $monday = date('Y-m-d', strtotime('monday this week'));
+      $sunday = date('Y-m-d', strtotime('sunday this week'));
+      $citas = CitasModel::getAgenda($monday, $sunday, $uid);
+      require VIEWS_PATH . '/agenda.php';
+    }
+    public function agendaJson(){
+      header('Content-Type: application/json');
+      $uid = $_SESSION['usuario_id'];
+      $from = $_GET['from'] ?? date('Y-m-d');
+      $to = $_GET['to'] ?? date('Y-m-d');
+      echo json_encode (CitasModel::getAgenda($from, $to, $uid));
     }
     public function citas($id){
         $citas = CitasModel::getByUsuario($id);

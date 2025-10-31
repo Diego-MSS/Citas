@@ -7,6 +7,8 @@ require_once BASE_PATH . '\Controladores\CitasController.php';
 
 define('VIEWS_PATH',BASE_PATH . '\Vistas');
 
+date_default_timezone_set('Europe/Madrid');
+
 session_start();
 function requireLogin(){
     if(!isset($_SESSION['usuario_id'])){
@@ -36,6 +38,11 @@ switch($uri){
         requireLogin();
         $controller = new CitasController();
         $controller -> index();
+        break;
+    case'/api/agenda':
+        requireLogin();
+        $controller = new CitasController();
+        $controller->agendaJson();
         break;
     case '/perfil':
         //Vista del perfil de cada persona que 

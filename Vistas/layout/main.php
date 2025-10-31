@@ -17,6 +17,14 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 $csrf = $_SESSION['csrf'] ??= bin2hex(random_bytes(16));
 ?>
+<script>
+function ymdLocal(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+</script>
 
 <!-- Modal Agendar Cita -->
 <div class="modal fade" id="modalAgendar" tabindex="-1" aria-labelledby="modalAgendarLabel" aria-hidden="true">
@@ -84,21 +92,20 @@ $csrf = $_SESSION['csrf'] ??= bin2hex(random_bytes(16));
     window._fp = flatpickr('#inputFecha', {
       locale: 'es',
       dateFormat: 'd/m/Y',
-      altInput: false,
       minDate: 'today',
-      defaultDate: fechaPreseleccionada || null,
-      onChange: function(selectedDates, dateStr, instance) {
-        const iso = selectedDates.length ? selectedDates[0].toISOString().slice(0,10) : '';
+      onChange: function(selectedDates) {
+        const iso = selectedDates.length ? ymdLocal(selectedDates[0]) : '';
         document.getElementById('fechaISO').value = iso;
-        cargarHoras(iso);
+        if (iso) cargarHoras(iso);
       }
     });
 
-    // Si ya venía fecha preseleccionada (por ejemplo, desde la agenda)
+    // si recibes fecha preseleccionada
     if (fechaPreseleccionada) {
       const d = new Date(fechaPreseleccionada);
-      document.getElementById('fechaISO').value = d.toISOString().slice(0,10);
-      cargarHoras(d.toISOString().slice(0,10));
+      const iso = ymdLocal(d);
+      document.getElementById('fechaISO').value = iso;
+      cargarHoras(iso);
     }
   }
 

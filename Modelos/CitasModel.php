@@ -59,4 +59,22 @@ class CitasModel{
             ":a"=>$asunto
         ]);
     }
+    public static function getAgenda(string $from, string $to, int $uid){
+        $db=DB::getInstance();
+        $sql="SELECT c.id, c.fecha, s.hora time, c.asunto, c.estado 
+            from cita c 
+            join slots s on s.id = c.hora
+            where c.usuario = :u 
+            and c.fecha between :f and :t 
+            order by c.fecha, s.hora";
+        $st= $db->prepare($sql);
+        $st->execute([
+            ':u' => $uid,
+            ':f' => $from,
+            ':t' => $to
+        ]);
+        $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+        foreach($rows as $r) $r['time'] = substr($r['time'],0,5);
+        return $rows;
+    }
 }
