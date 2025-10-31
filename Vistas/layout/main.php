@@ -143,6 +143,38 @@ $csrf = $_SESSION['csrf'] ??= bin2hex(random_bytes(16));
   document.getElementById('inputAsunto').addEventListener('input', toggleSubmit);
 </script>
 
+<?php if (!empty($_SESSION['flash'])): ?>
+  <?php
+    $tipo = $_SESSION['flash']['tipo'] ?? 'Aviso';
+    $titulo = $_SESSION['flash']['titulo'] ?? 'Aviso';
+    $mensaje = $_SESSION['flash']['mensaje'] ?? '';
+    unset($_SESSION['flash']); // Se borra después de mostrarlo
+  ?>
+  <div class="modal fade" id="modalFlash" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-header bg-<?= $tipo ?> text-white">
+          <h5 class="modal-title"><?= htmlspecialchars($titulo) ?></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0"><?= $mensaje ?></p> <!-- no htmlspecialchars para permitir <br> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = new bootstrap.Modal(document.getElementById('modalFlash'));
+      modal.show();
+
+      // Cerrar automáticamente después de 3 segundos
+      setTimeout(() => modal.hide(), 3000);
+    });
+  </script>
+<?php endif; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
