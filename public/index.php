@@ -81,4 +81,13 @@ switch($uri){
             header('Location: /agenda');exit;
         }
         break;
+    case '/citas/cancelar':
+        requireLogin();
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $controller = new CitasController();
+            $controller -> cancelar();
+        }else{
+            header('Location: /agenda');
+        }
+        break;
 }

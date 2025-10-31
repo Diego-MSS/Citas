@@ -4,7 +4,7 @@ class CitasModel{
     public static function getByUsuario($id){
         $db = DB::getInstance();
 
-        $stmt=$db->prepare('select c.fecha, s.hora, c.asunto, c.estado from cita c join slots as s on c.hora = s.id where usuario = :id ORDER BY fecha DESC');
+        $stmt=$db->prepare('select c.id, c.fecha, s.hora, c.asunto, c.estado from cita c join slots as s on c.hora = s.id where usuario = :id ORDER BY fecha DESC');
         $stmt->bindParam(':id', $id);
         $stmt->execute();
 
@@ -31,6 +31,7 @@ class CitasModel{
         }
         return $row;
     }
+
     public static function comprobarSlot($slotId){
         $db = DB::getInstance();
 
@@ -39,6 +40,7 @@ class CitasModel{
 
         return $st->fetchColumn() > 0;
     }
+
     public static function slotDisponible($slotId, $fecha): bool{
         $db = DB::getInstance();
 
@@ -47,6 +49,7 @@ class CitasModel{
         
         return (int)$st ->fetchColumn() === 0;
     }
+
     public static function crearCita($usuarioId, $fecha, $slotId, $asunto){
         $db = DB::getInstance();
 
@@ -59,6 +62,7 @@ class CitasModel{
             ":a"=>$asunto
         ]);
     }
+
     public static function getAgenda(string $from, string $to, int $uid){
         $db=DB::getInstance();
         $sql="SELECT c.id, c.fecha, s.hora time, c.asunto, c.estado 
@@ -76,5 +80,36 @@ class CitasModel{
         $rows = $st->fetchAll(PDO::FETCH_ASSOC);
         foreach($rows as $r) $r['time'] = substr($r['time'],0,5);
         return $rows;
+    }
+
+    public static function cancelar($citaId, $usuarioId): ?array{
+        $db = DB::getInstance();
+
+        $cita = self::getCita($citaId, $usuarioId);
+        if(!$cita){
+            return ['ok' => false, 'msg' =>'Cita no encontrada o no pertenece al usuario.'];
+        }
+        if($cita['estado' === 'CANCELADA']){
+            return['ok' => false, 'msg'=> 'La cita ya estaba cancelada'];
+        }
+        $st = $db ->prepare("UPDATE cita SET estado = 'CANCELADA' where id = :id and usuario = :u");
+        $st -> execute([":id" =>$citaId, ":u" => $usuarioId]);
+
+        if($st->rowCount()> 0){
+            return ['ok' => true, 'msg'=> 'La cita ha sido cancelada correctamente.'];
+        }
+        return ['ok' => false, 'msg' => 'No se pudo cancelar la cita correctamente'];
+    }
+    public static function getCita($citaId, $usuarioId): array{
+        $db = DB::getInstance();
+        $sql="SELECT c.id, c.usuario, c.fecha, s.hora, c.estado
+            FROM cita c
+            join slots s on c.hora = s.id
+            where c.id = :id
+            and c.usuario = :u
+            limit 1";
+        $st=$db->prepare($sql);
+        $st -> execute([":id" => $citaId, ":u" => $usuarioId]);
+        return $st->fetch(PDO::FETCH_ASSOC) ? :null;
     }
 }

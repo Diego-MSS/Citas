@@ -136,7 +136,7 @@
               <form method="POST" action="/citas/cancelar" style="display:inline;">
                 <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'] ?? '') ?>">
                 <input type="hidden" name="id" value="${c.id}">
-                <button class="btn btn-sm btn-outline-danger">Anular</button>
+                <button class="btn btn-sm btn-outline-danger onclick="return confirm('¿Seguro que quieres anular esta cita?');"">Anular</button>
               </form>
             </div>
           `;

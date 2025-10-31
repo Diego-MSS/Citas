@@ -75,5 +75,40 @@ public function crear() {
     ];
 
     header('Location: /citas'); exit;
-}
+  }
+  public function cancelar(){
+
+    $token = $_POST['csrf'] ?? '';
+    if (!$token || !hash_equals($_SESSION['csrf'] ?? '', $token)) {
+        http_response_code(403);
+        $_SESSION['flash'] = [
+            'tipo' => 'danger',
+            'titulo' => 'Acción no permitida',
+            'mensaje' => 'Token CSRF inválido.'
+        ];
+        header('Location: /citas'); exit;
+    }
+
+    $userId = $_SESSION['usuario_id'];
+    $citaId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+
+    if($citaId<=0){
+      $_SESSION['flash'] = [
+        'tipo' => 'danger',
+        'titulo' => 'Error',
+        'mensaje' => 'Identificador de la cita invalido.'
+      ];
+      header('Location: /agenda');
+    }
+    $res = CitasModel::cancelar($citaId, $userId);
+    
+    $_SESSION['flash'] = [
+      'tipo' => $res['ok'] ? 'success' : 'danger',
+      'titulo'=> $res['ok'] ? 'Cita anulada' : 'No se pudo anular',
+      'mensaje' => $res['msg']
+    ];
+
+    header('Location: /agenda');
+    exit;
+  }
 }
