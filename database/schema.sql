@@ -17,7 +17,7 @@ create table CITA(
 id int auto_increment primary key, 
 fecha date, 
 hora int,
-asunto Varchar(250) 
+asunto Varchar(250), 
 usuario int, 
 estado enum('RESERVADA', 'CONFIRMADA', 'CANCELADA', 'FINALIZADA') DEFAULT 'RESERVADA',
 foreign key (hora) references SLOTS (id), 
