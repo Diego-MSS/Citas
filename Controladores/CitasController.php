@@ -19,7 +19,13 @@ class CitasController{
     }
 
     public function citas($id){
-        $citas = CitasModel::getByUsuario($id);
+        $fitros = [
+          'desde' => $_GET['desde'] ?? '',
+          'hasta' => $_GET['hasta'] ?? '',
+          'estado' => $_GET['estado'] ?? '',
+          'q' => $_GET['q'] ?? ''
+        ];
+        $citas = CitasModel::getByUsuario($id, $fitros);
         require VIEWS_PATH . '/citas.php';
     }
 

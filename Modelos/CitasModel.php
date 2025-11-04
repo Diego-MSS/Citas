@@ -1,14 +1,34 @@
 <?php
 
 class CitasModel{
-    public static function getByUsuario($id){
+    public static function getByUsuario($id, array $fitros): array {
         $db = DB::getInstance();
+        $sql= 'select c.id, c.fecha, s.hora, c.asunto, c.estado
+                            from cita c 
+                            join slots as s on c.hora = s.id
+                             where usuario = :id';
+        $p =[":id"=>$id];
+        if (!empty($fitros['desde'])){
+            $sql .= "and c.fecha >= :d";
+            $p[":d"]=$filtros['desde'];
+        }
+        if(!empty($fitros['hasta'])){
+            $sql .= "and c.fecha <= :h";
+            $p[":h"]=$fitros['hasta'];
+        }
+        if(!empty($fitros['estado'])){
+            $sql .= "and c.estado = :e";
+            $p[":e"]=$fitros['estado'];
+        }
+        if (!empty($filtros['q'])){ 
+            $sql .= " AND c.asunto LIKE :q"; 
+            $p[':q']="%{$filtros['q']}%"; 
+        }
+        $sql .= " ORDER BY c.fecha DESC, s.hora DESC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($p);
 
-        $stmt=$db->prepare('select c.id, c.fecha, s.hora, c.asunto, c.estado from cita c join slots as s on c.hora = s.id where usuario = :id ORDER BY fecha DESC');
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-
-        $citas = $stmt -> fetchALL(PDO::FETCH_ASSOC);
+        $citas = $stmt -> fetchALL(PDO::FETCH_ASSOC); 
 
         return $citas;
     }
