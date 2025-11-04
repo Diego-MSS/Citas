@@ -51,10 +51,6 @@ switch($uri){
         $controller = new AuthController();
         $controller -> perfil($id);
         break;
-    case '/buscar':
-        //Vista de la pagina que utilizaran las personas para ver sus citas sin estar logueadas
-        require VIEWS_PATH. '/buscar.php';
-        break;
     case '/citas':
         requireLogin();
         $id = $_SESSION['usuario_id'];
@@ -89,5 +85,17 @@ switch($uri){
         }else{
             header('Location: /agenda');
         }
+        break;
+    case '/buscar':
+        $controller = new AuthController();
+        $controller -> buscarUsuario();
+        break;
+    case '/agenda-publica':
+        $controller = new CitasController();
+        $controller -> agendaPublica();
+        break;
+    case '/api/agenda-publica':
+        $controller = new CitasController();
+        $controller -> agendaPublicaJson();
         break;
 }

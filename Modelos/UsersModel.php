@@ -25,22 +25,19 @@ class UsersModel
         ]);
         return (int) $db->lastInsertId();
     }
-
-    /** Obtiene un usuario por email (útil para login) */
-    public static function findByEmail(PDO $db, string $email): ?array
-    {
-        $st = $db->prepare('SELECT id, login, pass, nombre FROM usuario WHERE login = :email LIMIT 1');
-        $st->execute([':email' => $email]);
-        $u = $st->fetch(PDO::FETCH_ASSOC);
-        return $u ?: null;
-    }
-
-    /** (Opcional) Obtener por ID */
-    public static function findById(PDO $db, int $id): ?array
-    {
-        $st = $db->prepare('SELECT id, login, nombre FROM usuario WHERE id = :id LIMIT 1');
-        $st->execute([':id' => $id]);
-        $u = $st->fetch(PDO::FETCH_ASSOC);
-        return $u ?: null;
+    public static function buscar(string $q, int $limit = 20){
+        $db = DB::getInstance();
+        $sql = 'SELECT id, nombre 
+            FROM usuario
+            where nombre LIKE :q1 or login LIKE :q2
+            order by nombre asc
+            limit :lim';
+        $st = $db->prepare($sql);
+        $like = '%'.$q.'%';
+        $st->bindValue(':q1', $like, PDO::PARAM_STR);
+        $st->bindValue(':q2', $like, PDO::PARAM_STR);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll(PDO::FETCH_ASSOC);
     }
 }

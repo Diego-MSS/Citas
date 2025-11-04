@@ -9,6 +9,7 @@ class CitasController{
       $citas = CitasModel::getAgenda($monday, $sunday, $uid);
       require VIEWS_PATH . '/agenda.php';
     }
+
     public function agendaJson(){
       header('Content-Type: application/json');
       $uid = $_SESSION['usuario_id'];
@@ -16,10 +17,12 @@ class CitasController{
       $to = $_GET['to'] ?? date('Y-m-d');
       echo json_encode (CitasModel::getAgenda($from, $to, $uid));
     }
+
     public function citas($id){
         $citas = CitasModel::getByUsuario($id);
         require VIEWS_PATH . '/citas.php';
     }
+
     public function slotsJson() {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -76,6 +79,7 @@ public function crear() {
 
     header('Location: /citas'); exit;
   }
+
   public function cancelar(){
 
     $token = $_POST['csrf'] ?? '';
@@ -111,4 +115,36 @@ public function crear() {
     header('Location: /agenda');
     exit;
   }
+  public function agendaPublica() {
+    // Lee userId y rango (si no hay rango, semana actual)
+    $userId = (int)($_GET['user'] ?? 0);
+
+    // Fechas por defecto: semana actual (lunes a domingo)
+    $hoy = new DateTime();
+    $dow = (int)$hoy->format('N'); // 1=Mon..7=Sun
+    $monday = (clone $hoy)->modify('-'.($dow-1).' day');
+    $sunday = (clone $monday)->modify('+6 day');
+
+    $from = $_GET['from'] ?? $monday->format('Y-m-d');
+    $to   = $_GET['to']   ?? $sunday->format('Y-m-d');
+
+    $citas = [];
+    if ($userId > 0) {
+        $citas = CitasModel::getAgenda($from, $to, $userId);
+    }
+    $title = 'Agenda pública';
+    include VIEWS_PATH . '/agenda_publica.php';
+}
+
+public function agendaPublicaJson() {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $userId = (int)($_GET['user'] ?? 0);
+    $from = $_GET['from'] ?? date('Y-m-d');
+    $to   = $_GET['to']   ?? date('Y-m-d');
+
+    if ($userId <= 0) { echo json_encode([]); return; }
+
+    echo json_encode(CitasModel::getAgenda($from, $to, $userId));
+}
 }

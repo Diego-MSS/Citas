@@ -72,4 +72,14 @@ class AuthController{
         $title = 'Login';
         include VIEWS_PATH . '/login.php';
     }
+    
+    public function buscarUsuario(){
+        $title = "Buscar Usuario";
+        $q = trim($_GET['q'] ?? '');
+        $resultados = [];
+        if($q !== ''){
+            $resultados = UsersModel::buscar($q);
+        }
+        include VIEWS_PATH . '/buscar.php';
+    }
 }
