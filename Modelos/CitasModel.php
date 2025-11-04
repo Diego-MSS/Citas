@@ -9,20 +9,20 @@ class CitasModel{
                              where usuario = :id';
         $p =[":id"=>$id];
         if (!empty($fitros['desde'])){
-            $sql .= "and c.fecha >= :d";
+            $sql .= " and c.fecha >= :d";
             $p[":d"]=$filtros['desde'];
         }
         if(!empty($fitros['hasta'])){
-            $sql .= "and c.fecha <= :h";
+            $sql .= " and c.fecha <= :h";
             $p[":h"]=$fitros['hasta'];
         }
         if(!empty($fitros['estado'])){
-            $sql .= "and c.estado = :e";
+            $sql .= " and c.estado = :e";
             $p[":e"]=$fitros['estado'];
         }
-        if (!empty($filtros['q'])){ 
+        if (!empty($fitros['q'])){ 
             $sql .= " AND c.asunto LIKE :q"; 
-            $p[':q']="%{$filtros['q']}%"; 
+            $p[':q']="%{$fitros['q']}%"; 
         }
         $sql .= " ORDER BY c.fecha DESC, s.hora DESC";
         $stmt = $db->prepare($sql);
@@ -32,6 +32,7 @@ class CitasModel{
 
         return $citas;
     }
+
     public static function getSlots($fecha){
         $db = DB::getInstance();
 

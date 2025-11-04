@@ -6,7 +6,7 @@
       <button class="btn btn-outline-secondary btn-sm" id="btnAnterior">← Semana anterior</button>
       <button class="btn btn-outline-secondary btn-sm" id="btnHoy">Hoy</button>
       <button class="btn btn-outline-secondary btn-sm" id="btnSiguiente">Semana siguiente →</button>
-      <button class="btn btn-primary btn-sm" onclick="abrirAgendar()">+ Nueva cita</button>
+      <button class="btn btn-success btn-sm ms-auto" onclick="abrirAgendar()">+ Nueva cita</button>
     </div>
   </div>
 
