@@ -19,6 +19,6 @@ fecha date,
 hora int,
 asunto Varchar(250) 
 usuario int, 
-estado enum(’RESERVADA’, ‘CONFIRMADA’,CANCELADA’,’FINALIZADA’) DEFAULT ‘RESERVADA’,
+estado enum('RESERVADA', 'CONFIRMADA', 'CANCELADA', 'FINALIZADA') DEFAULT 'RESERVADA',
 foreign key (hora) references SLOTS (id), 
 foreign key (usuario) references USUARIO (id));
