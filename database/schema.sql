@@ -1,4 +1,4 @@
-set names utf8mba;
+set names utf8mb4;
 set FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS CITA;
