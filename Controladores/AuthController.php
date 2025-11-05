@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../Modelos/UsersModel.php';
 
 class AuthController{
+    //Formulario de registro de los usuarios
     public function registerForm(){
         $db = DB::getInstance();
         $errores = [];
@@ -12,7 +13,8 @@ class AuthController{
             $login=trim($_POST['email'] ?? '');
             $pass=trim($_POST['pass'] ?? '');
             $confirmar=trim($_POST['confirmar'] ?? '');
-
+            
+            //Comprobacion de los datos
             if($nombre === ''|| $login===''||$pass===''){
                 $errores[]="Todos los campos son obligatorios.";
             }
@@ -22,16 +24,15 @@ class AuthController{
             if($pass !== $confirmar){
                 $errores[]="Las contraseñas no coinciden.";
             }
-
-            $stmt = $db->prepare("select id from usuario where login = :email");
-            $stmt ->execute([':email'=> $login]);
-            if($stmt->fetch()){
-                $errores[]="Ya existe ese usuario";
+            if(UsersModel::existsByEmail($login)){
+                $errores[]="Ya existe ese usuario.";
             }
+            //Si no hay errores al comprobar los datos, se crea el usuario
             if(empty($errores)){
                 $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
-                $usuarioID = UsersModel::create($db, $nombre, $login, $pass_hash);
+                $usuarioID = UsersModel::create($nombre, $login, $pass_hash);
 
+                //Pasamos los datos del usuario a la variable $_SESSION para que pueda entrar en las demas areas.
                 if(session_status() === PHP_SESSION_NONE) session_start();
                 $_SESSION['usuario_id'] = $usuarioID;
                 $_SESSION['usuario_nombre'] = $nombre;
@@ -44,6 +45,8 @@ class AuthController{
         $title = 'Crear cuenta';
         include VIEWS_PATH . '\registrar.php';
     }
+
+    //Funcion que maneja los datos del formulario de autentificacion para que el usuario pueda entrar a diversas areas.
     public function loginForm(){
         $db = DB::getInstance();
         $errores = [];
@@ -53,14 +56,16 @@ class AuthController{
             $pass = trim($_POST['pass'] ?? '');
 
             if ($login === '' || $pass === ''){
-                $errores[] = 'Debe rellenar todos los campos';
+                $errores[] = 'Debe rellenar todos los campos.';
             }
             if(!filter_var($login,FILTER_VALIDATE_EMAIL)){
                 $errores[]="El email no es valido.";
             }
-            $stmt=$db->prepare("SELECT * FROM usuario where login = :email");
-            $stmt->execute([':email'=> $login]);
-            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+            if(!(UsersModel::existsByEmail($login))){
+                $errores[]="El usuario debe estar registrado en la app con anterioridad.";
+            }
+            $usuario = UsersModel::getUsuario($login);
+
             if ($usuario && password_verify($pass, $usuario['pass'])){
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];

@@ -77,6 +77,7 @@ public function crear() {
 
     // Insertar cita
     CitasModel::crearCita($usuarioId, $fecha, $slotId, $asunto);
+    
     $_SESSION['flash']=[
       'tipo' => 'success',
       'titulo' => '¡Cita creada!',
