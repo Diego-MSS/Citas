@@ -43,7 +43,7 @@ class AuthController{
             }
         }
         $title = 'Crear cuenta';
-        include VIEWS_PATH . '\registrar.php';
+        include VIEWS_PATH . '/registrar.php';
     }
 
     //Funcion que maneja los datos del formulario de autentificacion para que el usuario pueda entrar a diversas areas.

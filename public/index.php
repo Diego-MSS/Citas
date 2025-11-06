@@ -1,11 +1,11 @@
 <?php
 define('BASE_PATH', dirname(__DIR__));
 
-require_once BASE_PATH . '\config\db.php';
-require_once BASE_PATH . '\Controladores\AuthController.php';
-require_once BASE_PATH . '\Controladores\CitasController.php';
+require_once BASE_PATH . '/config/db.php';
+require_once BASE_PATH . '/Controladores/AuthController.php';
+require_once BASE_PATH . '/Controladores/CitasController.php';
 
-define('VIEWS_PATH',BASE_PATH . '\Vistas');
+define('VIEWS_PATH',BASE_PATH . '/Vistas');
 
 date_default_timezone_set('Europe/Madrid');
 
