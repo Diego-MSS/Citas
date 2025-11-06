@@ -21,7 +21,7 @@ $uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 switch($uri){
     case'/':
         //Vista de la pagina principal, como se hace ya que no necesito ningun controlador para hacer una landing page
-        require VIEWS_PATH. '\landing.php';
+        require VIEWS_PATH. '/landing.php';
         break;
     case '/login':
         //Vista del login de la app
