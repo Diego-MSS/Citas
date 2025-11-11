@@ -128,7 +128,15 @@
           else if (c.estado === 'CANCELADA') color = 'danger';
           else if (c.estado === 'COMPLETADA') color = 'success';
 
-          td.innerHTML = `
+          if (c.estado === 'CANCELADA'){
+            td.innerHTML = `
+            <div class="fw-semibold">${horaHM}</div>
+            <div class="small text-muted">${c.asunto || ''}</div>
+            <span class="badge bg-${color}">${c.estado}</span>
+            
+          `;
+          }else{
+            td.innerHTML = `
             <div class="fw-semibold">${horaHM}</div>
             <div class="small text-muted">${c.asunto || ''}</div>
             <span class="badge bg-${color}">${c.estado}</span>
@@ -140,6 +148,8 @@
               </form>
             </div>
           `;
+          }
+          
         }
         tr.appendChild(td);
       });
