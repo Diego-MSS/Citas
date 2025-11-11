@@ -8,7 +8,7 @@ class UsersModel
     {
         $db = DB::getInstance();
 
-        $st = $db->prepare('SELECT 1 FROM usuario WHERE login = :email LIMIT 1');
+        $st = $db->prepare('SELECT 1 FROM USUARIO WHERE login = :email LIMIT 1');
         $st->execute([':email' => $email]);
         return (bool) $st->fetchColumn();
     }
@@ -18,7 +18,7 @@ class UsersModel
     {
         $db = DB::getInstance();
         $st = $db->prepare('
-            INSERT INTO usuario (login, pass, nombre)
+            INSERT INTO USUARIO (login, pass, nombre)
             VALUES (:login, :pass, :nombre)
         ');
         $st->execute([
@@ -31,7 +31,7 @@ class UsersModel
     public static function buscar(string $q, int $limit = 20){
         $db = DB::getInstance();
         $sql = 'SELECT id, nombre 
-            FROM usuario
+            FROM USUARIO
             where nombre LIKE :q1 or login LIKE :q2
             order by nombre asc
             limit :lim';
@@ -47,7 +47,7 @@ class UsersModel
         $db = DB::getInstance();
 
         $sql = 'SELECT * 
-                FROM usuario
+                FROM USUARIO
                 WHERE login = :email';
         $usuario = $db ->prepare($sql);
         $usuario->execute([

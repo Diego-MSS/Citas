@@ -1,7 +1,6 @@
 <?php
-// C:\Users\diego\Desktop\Citas\config\db.php
 
-$envPath = dirname(__DIR__) . '/.env'; // lee .env desde la raíz del proyecto
+$envPath = __DIR__ . '/.env'; // lee .env desde la raíz del proyecto
 $_ENV = parse_ini_file($envPath);
 
 class DB {

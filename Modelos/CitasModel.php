@@ -4,8 +4,8 @@ class CitasModel{
     public static function getByUsuario($id, array $fitros): array {
         $db = DB::getInstance();
         $sql= 'select c.id, c.fecha, s.hora, c.asunto, c.estado
-                            from cita c 
-                            join slots as s on c.hora = s.id
+                            from CITA c 
+                            join SLOTS as s on c.hora = s.id
                              where usuario = :id';
         $p =[":id"=>$id];
         if (!empty($fitros['desde'])){
@@ -38,8 +38,8 @@ class CitasModel{
 
         $st = $db->prepare("SELECT s.hora as time, s.id as slot_id,
              CASE WHEN c.hora IS NULL THEN 1 ELSE 0 END AS available
-            FROM slots s
-            LEFT JOIN cita c
+            FROM SLOTS s
+            LEFT JOIN CITA c
                 ON c.hora = s.id AND c.fecha = :fecha
             ORDER BY s.hora ASC
             ");
@@ -56,7 +56,7 @@ class CitasModel{
     public static function comprobarSlot($slotId){
         $db = DB::getInstance();
 
-        $st = $db -> prepare("SELECT COUNT(*) FROM slots WHERE id = :id");
+        $st = $db -> prepare("SELECT COUNT(*) FROM SLOTS WHERE id = :id");
         $st->execute([":id"=>$slotId]);
 
         return $st->fetchColumn() > 0;
@@ -65,7 +65,7 @@ class CitasModel{
     public static function slotDisponible($slotId, $fecha): bool{
         $db = DB::getInstance();
 
-        $st= $db->prepare("SELECT COUNT(*) FROM cita WHERE hora = :horaid AND fecha =:fecha");
+        $st= $db->prepare("SELECT COUNT(*) FROM CITA WHERE hora = :horaid AND fecha =:fecha");
         $st->execute([":horaid"=> $slotId, ":fecha" => $fecha]);
         
         return (int)$st ->fetchColumn() === 0;
@@ -74,7 +74,7 @@ class CitasModel{
     public static function crearCita($usuarioId, $fecha, $slotId, $asunto){
         $db = DB::getInstance();
 
-        $st=$db->prepare("INSERT INTO cita (usuario, fecha, hora, asunto, estado) VALUE ( :u, :f, :h, :a, 'RESERVADA')");
+        $st=$db->prepare("INSERT INTO CITA (usuario, fecha, hora, asunto, estado) VALUE ( :u, :f, :h, :a, 'RESERVADA')");
 
         $st->execute([ 
             ":u"=>$usuarioId,
@@ -87,8 +87,8 @@ class CitasModel{
     public static function getAgenda(string $from, string $to, int $uid){
         $db=DB::getInstance();
         $sql="SELECT c.id, c.fecha, s.hora time, c.asunto, c.estado 
-            from cita c 
-            join slots s on s.id = c.hora
+            from CITA c 
+            join SLOTS s on s.id = c.hora
             where c.usuario = :u 
             and c.fecha between :f and :t 
             order by c.fecha, s.hora";
@@ -113,7 +113,7 @@ class CitasModel{
         if($cita['estado' === 'CANCELADA']){
             return['ok' => false, 'msg'=> 'La cita ya estaba cancelada'];
         }
-        $st = $db ->prepare("UPDATE cita SET estado = 'CANCELADA' where id = :id and usuario = :u");
+        $st = $db ->prepare("UPDATE CITA SET estado = 'CANCELADA' where id = :id and usuario = :u");
         $st -> execute([":id" =>$citaId, ":u" => $usuarioId]);
 
         if($st->rowCount()> 0){
@@ -124,8 +124,8 @@ class CitasModel{
     public static function getCita($citaId, $usuarioId): array{
         $db = DB::getInstance();
         $sql="SELECT c.id, c.usuario, c.fecha, s.hora, c.estado
-            FROM cita c
-            join slots s on c.hora = s.id
+            FROM CITA c
+            join SLOTS s on c.hora = s.id
             where c.id = :id
             and c.usuario = :u
             limit 1";
