@@ -1,7 +1,14 @@
 <?php
 require_once __DIR__ . '/../Modelos/CitasModel.php';
+/** Este es el controlador de Citas. Lo que hace que se conecten las paginas que necesiten datos de citas con los propios datos de las citas */
 
 class CitasController{
+  /**
+   * Nombre: index()
+   * Recibe: Nada
+   * Devuelve: Nada
+   * Descripcion: Saca los parametros de la semana en la que estamos, y el id del usuario que se guarda en $_SESSION al empezar la sesion. Y los envia a traves de la funcion getAgenda del MOdelo de Citas. 
+   */
     public function index(){
       $uid = $_SESSION['usuario_id'];
       $monday = date('Y-m-d', strtotime('monday this week'));
@@ -10,6 +17,12 @@ class CitasController{
       require VIEWS_PATH . '/agenda.php';
     }
 
+    /**
+     * Nombre: agendaJson()
+     * Recibe: Los dias donde comienza y termina la semana mediante un metodo GET
+     * Devuelve: Nada
+     * Descripcion: Es al igal que el index() solo que los guarda en un JSON para que el JavaScript los pueda leer sin tener que volver a lanzar la peticion del GET y asi tener una pagina mas dinamica.
+     */
     public function agendaJson(){
       header('Content-Type: application/json');
       $uid = $_SESSION['usuario_id'];
@@ -17,6 +30,13 @@ class CitasController{
       $to = $_GET['to'] ?? date('Y-m-d');
       echo json_encode (CitasModel::getAgenda($from, $to, $uid));
     }
+    
+    /**
+     * Nombre: citas()
+     * Recibe: la variable $id desde el front-controller. Y los datos de los filtros por los que quiere buscar la cita el usuario mediante un metodo GET
+     * Devuelve: Nada
+     * Descripcion: recibe el id del usuario y los filtros en un metodo POST para mostrar las citas, o en su totalidad a falta de filtros o las citas que esten dentro del filtro del usuario.
+     */
 
     public function citas($id){
         $fitros = [
@@ -29,6 +49,12 @@ class CitasController{
         require VIEWS_PATH . '/citas.php';
     }
 
+    /**
+     * Nombre: slotsJson()
+     * Recibe: La fecha en la que buscar los slots libres mediante un metodo GET
+     * Devuelve: Nada
+     * Descripcion: Mediante la fecha que seleccione el usuario, esta funcion llama a una funcion preescrita para recibir los parametros de los slots libres. Al fina esta funcion crea un Json para que javascript cree una API a este archivo y que de manera dinamica y sin tener que realizxar mas de una peticion GET pueda mostrar los slots libres.
+     */
     public function slotsJson() {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -42,6 +68,20 @@ class CitasController{
     exit;
 }
 
+
+/**
+ * Nombre: crear()
+ * Recibe: Mediante el metodo POST desde el lado del cliente esta funcion recibe los datos para crear una cita.
+ * Devuelve: En caso de que se cumpla y se cree, un FLASH para que aparezca un modal con SUCCESS y en caso de que no se cumpla, aparecera un modal con DANGER
+ * Descripcion:
+ *  ->Comprueba que la sesion esta iniciada y si no la crea. 
+ *  ->Comprueba el token csrf para que no se produzcan ataques mediante enlaces externos.
+ *  ->Recibe el id del usuario de la variable $_SESSION, la fecha, el slot y el asunto los recibe mediante un metodo POST del formulario de crear la cita.
+ *  ->Comprueba que no ha habido ningun error, en cuanto a fecha, hora y que el asunto no se quede vacio.
+ *  ->Verifica que la hora esta libre y que este.
+ *  ->Si hay errores los muestra 
+ *  ->En caso de que no haya errores, crea la cita y lanza el modal SUCCESS.
+ */
 public function crear() {
     if (session_status() === PHP_SESSION_NONE) session_start();
     // CSRF
