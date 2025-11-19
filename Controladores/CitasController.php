@@ -21,7 +21,7 @@ class CitasController{
      * Nombre: agendaJson()
      * Recibe: Los dias donde comienza y termina la semana mediante un metodo GET
      * Devuelve: Nada
-     * Descripcion: Es al igal que el index() solo que los guarda en un JSON para que el JavaScript los pueda leer sin tener que volver a lanzar la peticion del GET y asi tener una pagina mas dinamica.
+     * Descripcion: Es al igual que el index() solo que los guarda en un JSON para que el JavaScript los pueda leer sin tener que volver a lanzar la peticion del GET y asi tener una pagina mas dinamica.
      */
     public function agendaJson(){
       header('Content-Type: application/json');
@@ -127,6 +127,15 @@ public function crear() {
     header('Location: /citas'); exit;
   }
 
+  /**
+   * Nombre: cancelar()
+   * Recibe: Mediante el formulario POST de anular cita, recibe el id de la cita.
+   * Devuelve: Un modal flash.
+   * Descripcion: 
+   *      ->La funcion recibe por el formulario POST el id de la cita.
+   *      ->En caso de que la cita no exita, la funcion devuelve un modal de error.
+   *      ->En caso de que exita, se hace una llamada al modelo para que se cancele la cita pasandole el id de la cita.
+   */
   public function cancelar(){
 
     $token = $_POST['csrf'] ?? '';
@@ -162,6 +171,16 @@ public function crear() {
     header('Location: /agenda');
     exit;
   }
+  
+  /**
+   * Nombre: agendaPublica()
+   * Recibe: Mediante la busqueda de usuarios, recibe el id del usuario al que quiere ver la agenda.
+   * Devuelve: Nada.
+   * Descripcion: 
+   *    ->Se recibe el usuario mediante el formulario get
+   *    ->Se guardan los dias del dia en el que estamos, cuando empieza la semana en la que estamos y cuando termina.
+   *    ->Se hace una llamada a la funcion getAgenda() con los parametros de la semana para que aparezca en la vista la agenda del usuario.
+   */
   public function agendaPublica() {
     // Lee userId y rango (si no hay rango, semana actual)
     $userId = (int)($_GET['user'] ?? 0);
@@ -183,6 +202,15 @@ public function crear() {
     include VIEWS_PATH . '/agenda_publica.php';
 }
 
+/**
+ * Nombre: agendaPublicaJson
+ * Recibe: El id del usuario, el dia que empieza la semana, y el dia que termina.
+ * Devuelve: Un Json con las citas del usuario.
+ * Descripcion: 
+ *      ->Saca y guarda en un Json las citas del usuario para que el programa no tenga que hacer muchas peticiones y se sature.
+ *      ->Esto hace que la vista sea mas dinamica y que no se sature el servidor con miles de peticiones y sentencias sql.
+ * 
+ */
 public function agendaPublicaJson() {
     header('Content-Type: application/json; charset=utf-8');
 

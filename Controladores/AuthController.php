@@ -2,7 +2,17 @@
 require_once __DIR__ . '/../Modelos/UsersModel.php';
 
 class AuthController{
-    //Formulario de registro de los usuarios
+
+    /**
+     * Nombre: registerForm()
+     * Recibe: Mediante el formulario de registro la funcion recibe el nobre, el email, la contraseña y la contraseña repetida para confirmar que es igual.
+     * Devuelve: Un modal, en caso de que todos los datos sean corectos sera de metodo SUCCESS y en caso de que haya algun problema DANGER.
+     * Descripcion:
+     *      ->Recibe los datos del usuario que se quiere registrar en nuestra app
+     *      ->Comprueba que los datos sean correctos y validos.
+     *      ->Si no hay errores al comprobar los datos los guarda en la base de datos mediante una llamada de la funcion del modelo.
+     *      ->En caso de que haya errores, vuelves a la pagina de registro y se marcan los errores que se han cometido al hacer el registro.
+     */
     public function registerForm(){
         $db = DB::getInstance();
         $errores = [];
@@ -46,7 +56,15 @@ class AuthController{
         include VIEWS_PATH . '/registrar.php';
     }
 
-    //Funcion que maneja los datos del formulario de autentificacion para que el usuario pueda entrar a diversas areas.
+    /**
+     * Nombre: loginForm()
+     * Recibe: Mediante el formulario de autentificacion de la app recibe el usuario y la contraseña para poder entrar.
+     * Devuelve: En caso de error,una lista con los errores cometidos por el usuario.
+     * Descripcion:
+     *      ->Se piden los datos del usuario.
+     *      ->Se comprueban si los datos son correctos y validos.
+     *      ->En caso de que sean correcto se redirige a una de las paginas.
+     */
     public function loginForm(){
         $db = DB::getInstance();
         $errores = [];
@@ -78,6 +96,15 @@ class AuthController{
         include VIEWS_PATH . '/login.php';
     }
     
+    /**
+     * Nombre: buscarUsuario()
+     * Recibe: Mediante el formulario de busqueda de usuarios, recibe el nombre del usuario a buscar.
+     * Devuelve: Nada.
+     * Descripcion:
+     *      ->Recibe el nombre a buscar,
+     *      ->Lanza la consulta con el nombre 
+     *      ->Muestra los resultados en la vista.
+     */
     public function buscarUsuario(){
         $title = "Buscar Usuario";
         $q = trim($_GET['q'] ?? '');
