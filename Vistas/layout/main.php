@@ -12,7 +12,6 @@
     <?= $content ?? '' ?> 
   </main>
 
-  <?php include __DIR__ . '/footer.php'; ?>
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 $csrf = $_SESSION['csrf'] ??= bin2hex(random_bytes(16));

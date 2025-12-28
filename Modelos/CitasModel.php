@@ -53,24 +53,51 @@ class CitasModel{
      *      ->Validamos los datos recibidos por la consulta y los devolvemos al controlador.
      */
     public static function getSlots($fecha){
-        $db = DB::getInstance();
+    $db = DB::getInstance();
 
-        $st = $db->prepare("SELECT s.hora as time, s.id as slot_id,
-             CASE WHEN c.hora IS NULL THEN 1 ELSE 0 END AS available
-            FROM SLOTS s
-            LEFT JOIN CITA c
-                ON c.hora = s.id AND c.fecha = :fecha
-            ORDER BY s.hora ASC
-            ");
-        $st->execute([":fecha"=>$fecha]);
-        $row = $st->fetchAll(PDO::FETCH_ASSOC);
-        foreach($row as $r){
-            $r['slot_id']   = (int)$r['slot_id'];
-            $r['available'] = (bool)$r['available'];
-            if (isset($r['time'])) $r['time'] = substr($r['time'], 0, 5);
+    $st = $db->prepare("
+        SELECT 
+            s.hora AS time,
+            s.id AS slot_id,
+            CASE WHEN c.hora IS NULL THEN 1 ELSE 0 END AS free
+        FROM SLOTS s
+        LEFT JOIN CITA c
+            ON c.hora = s.id AND c.fecha = :fecha
+        ORDER BY s.hora ASC
+    ");
+    $st->execute([":fecha"=>$fecha]);
+
+    $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+
+    $hoy = (new DateTime('today'))->format('Y-m-d') === $fecha;
+    $ahora = new DateTime(); // hora actual del servidor
+
+    foreach ($rows as &$r) {
+        $r['slot_id'] = (int)$r['slot_id'];
+        $r['time'] = substr($r['time'], 0, 5);
+
+        $libre = ((int)$r['free'] === 1);
+
+        $pasado = false;
+        if ($hoy) {
+            // Construimos DateTime con la fecha seleccionada + la hora del slot
+            $slotDT = DateTime::createFromFormat('Y-m-d H:i', $fecha . ' ' . $r['time']);
+            // Si el slot es estrictamente anterior a "ahora", está pasado
+            $pasado = ($slotDT < $ahora);
         }
-        return $row;
+
+        // available = libre y no pasado
+        $r['available'] = ($libre && !$pasado);
+
+        // opcional: devolver el motivo para pintar estilos/tooltip
+        $r['reason'] = !$libre ? 'occupied' : ($pasado ? 'past' : 'ok');
+
+        unset($r['free']); // limpiamos campo auxiliar
     }
+    unset($r);
+
+    return $rows;
+}
     /**
      * Nombre: comprobarSlot()
      * Recibe: el id del slot a comprobar
