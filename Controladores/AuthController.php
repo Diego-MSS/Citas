@@ -48,8 +48,15 @@ class AuthController{
                 $_SESSION['usuario_nombre'] = $nombre;
                 $_SESSION['usuario_email'] = $login;
 
-                header('Location: /agenda');
+                header('Location: /agenda', true, 303);
                 exit;
+            }else{
+                $_SESSION['flash'] = [
+                    'tipo' => 'danger',
+                    'titulo' => 'Error al crear el usuario',
+                    'mensaje' => implode('<br>', $errores)
+                ];
+                header('Location: /registrar', true, 303);
             }
         }
         $title = 'Crear cuenta';
@@ -83,12 +90,21 @@ class AuthController{
                 $errores[]="El usuario debe estar registrado en la app con anterioridad.";
             }
             $usuario = UsersModel::getUsuario($login);
+            if(!empty($errores)){
+                $_SESSION['flash']= [
+                    'tipo' => 'danger',
+                    'titulo' => 'Error de login',
+                    'mensaje' => implode('<br>', $errores)
+                ];
+                header('Location: /login', true, 303);
+                exit;
+            }
 
             if ($usuario && password_verify($pass, $usuario['pass'])){
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
 
-                header('Location: /agenda');
+                header('Location: /agenda', true, 303);
                 exit;
             }
         }
