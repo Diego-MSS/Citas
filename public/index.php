@@ -12,7 +12,7 @@ date_default_timezone_set('Europe/Madrid');
 session_start();
 function requireLogin(){
     if(!isset($_SESSION['usuario_id'])){
-        header('Location: /login');
+        header('Location: /login', true, 303);
         exit;
     }
 }
@@ -83,7 +83,7 @@ switch($uri){
         session_start();
         session_unset();
         session_destroy();
-        header('Location: /');
+        header('Location: /', true, 303);
         exit;
     case '/api/slots':
         requireLogin();
@@ -96,7 +96,7 @@ switch($uri){
             $citas = new CitasController();
             $citas -> crear();
         }else{
-            header('Location: /agenda');exit;
+            header('Location: /agenda', true, 303);exit;
         }
         break;
     case '/citas/cancelar':
@@ -105,7 +105,8 @@ switch($uri){
             $controller = new CitasController();
             $controller -> cancelar();
         }else{
-            header('Location: /agenda');
+            header('Location: /agenda', true, 303);
+            exit;
         }
         break;
     case '/buscar':

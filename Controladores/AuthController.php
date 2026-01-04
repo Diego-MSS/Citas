@@ -16,9 +16,25 @@ class AuthController{
     public function registerForm(){
         $db = DB::getInstance();
         $errores = [];
+        if(session_status() === PHP_SESSION_NONE) session_start();
+        if (empty($_SESSION['csrf'])) {
+            $_SESSION['csrf'] = bin2hex(random_bytes(16));
+        }
+
 
         //El usuario envia los datos
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $token = $_POST['csrf'] ?? '';
+            if (!$token || !hash_equals($_SESSION['csrf'] ?? '', $token)) {
+                $_SESSION['flash'] = [
+                    'tipo' => 'danger',
+                    'titulo' => 'Solicitud inválida',
+                    'mensaje' => 'Token CSRF inválido.'
+                ];
+            header('Location: /registrar', true, 303);
+            exit;
+            }
+
             $nombre=trim($_POST['nombre'] ?? '');
             $login=trim($_POST['email'] ?? '');
             $pass=trim($_POST['pass'] ?? '');
@@ -57,6 +73,7 @@ class AuthController{
                     'mensaje' => implode('<br>', $errores)
                 ];
                 header('Location: /registrar', true, 303);
+                exit;
             }
         }
         $title = 'Crear cuenta';
@@ -73,44 +90,74 @@ class AuthController{
      *      ->En caso de que sean correcto se redirige a una de las paginas.
      */
     public function loginForm(){
-        $db = DB::getInstance();
-        $errores = [];
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $login = trim($_POST['email'] ?? '');
-            $pass = trim($_POST['pass'] ?? '');
-
-            if ($login === '' || $pass === ''){
-                $errores[] = 'Debe rellenar todos los campos.';
-            }
-            if(!filter_var($login,FILTER_VALIDATE_EMAIL)){
-                $errores[]="El email no es valido.";
-            }
-            if(!(UsersModel::existsByEmail($login))){
-                $errores[]="El usuario debe estar registrado en la app con anterioridad.";
-            }
-            $usuario = UsersModel::getUsuario($login);
-            if(!empty($errores)){
-                $_SESSION['flash']= [
-                    'tipo' => 'danger',
-                    'titulo' => 'Error de login',
-                    'mensaje' => implode('<br>', $errores)
-                ];
-                header('Location: /login', true, 303);
-                exit;
-            }
-
-            if ($usuario && password_verify($pass, $usuario['pass'])){
-                $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['usuario_nombre'] = $usuario['nombre'];
-
-                header('Location: /agenda', true, 303);
-                exit;
-            }
-        }
-        $title = 'Login';
-        include VIEWS_PATH . '/login.php';
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (empty($_SESSION['csrf'])) {
+        $_SESSION['csrf'] = bin2hex(random_bytes(16));
     }
+    $errores = [];
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+        // ✅ CSRF solo en POST
+        $token = $_POST['csrf'] ?? '';
+        if (!$token || !hash_equals($_SESSION['csrf'] ?? '', $token)) {
+            $_SESSION['flash'] = [
+                'tipo' => 'danger',
+                'titulo' => 'Solicitud inválida',
+                'mensaje' => 'Token CSRF inválido.'
+            ];
+            header('Location: /login', true, 303);
+            exit;
+        }
+
+        $login = trim($_POST['email'] ?? '');
+        $pass  = trim($_POST['pass'] ?? '');
+
+        if ($login === '' || $pass === ''){
+            $errores[] = 'Debe rellenar todos los campos.';
+        }
+        if(!filter_var($login, FILTER_VALIDATE_EMAIL)){
+            $errores[] = "El email no es valido.";
+        }
+        if(!(UsersModel::existsByEmail($login))){
+            $errores[] = "El usuario debe estar registrado en la app con anterioridad.";
+        }
+
+        if(!empty($errores)){
+            $_SESSION['flash']= [
+                'tipo' => 'danger',
+                'titulo' => 'Error de login',
+                'mensaje' => implode('<br>', $errores)
+            ];
+            header('Location: /login', true, 303);
+            exit;
+        }
+
+        $usuario = UsersModel::getUsuario($login);
+
+        if ($usuario && password_verify($pass, $usuario['pass'])){
+            $_SESSION['usuario_id'] = $usuario['id'];
+            $_SESSION['usuario_nombre'] = $usuario['nombre'];
+
+            // (opcional pero recomendable)
+            $_SESSION['csrf'] = bin2hex(random_bytes(16));
+
+            header('Location: /agenda', true, 303);
+            exit;
+        } else {
+            $_SESSION['flash']= [
+                'tipo' => 'danger',
+                'titulo' => 'Error de login',
+                'mensaje' => 'Credenciales incorrectas.'
+            ];
+            header('Location: /login', true, 303);
+            exit;
+        }
+    }
+
+    $title = 'Login';
+    include VIEWS_PATH . '/login.php';
+}
     
     /**
      * Nombre: buscarUsuario()

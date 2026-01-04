@@ -152,7 +152,7 @@ public function crear() {
             'titulo' => 'Acción no permitida',
             'mensaje' => 'Token CSRF inválido.'
         ];
-        header('Location: /citas'); exit;
+        header('Location: /citas', true, 303); exit;
     }
 
     $userId = $_SESSION['usuario_id'];
@@ -164,7 +164,7 @@ public function crear() {
         'titulo' => 'Error',
         'mensaje' => 'Identificador de la cita invalido.'
       ];
-      header('Location: /agenda');
+      header('Location: /agenda', true, 303);
     }
     $res = CitasModel::cancelar($citaId, $userId);
     
@@ -174,7 +174,7 @@ public function crear() {
       'mensaje' => $res['msg']
     ];
 
-    header('Location: /agenda');
+    header('Location: /agenda', true, 303);
     exit;
   }
   

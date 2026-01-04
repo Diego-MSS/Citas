@@ -58,6 +58,7 @@
       required
     >
   </div>
+  <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'] ?? '') ?>">
 
   <button type="submit" class="btn btn-primary w-100">Registrarse</button>
 </form>
