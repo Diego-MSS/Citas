@@ -182,44 +182,50 @@ public function crear() {
    *    ->Se hace una llamada a la funcion getAgenda() con los parametros de la semana para que aparezca en la vista la agenda del usuario.
    */
   public function agendaPublica() {
-    // Lee userId y rango (si no hay rango, semana actual)
-    $userId = (int)($_GET['user'] ?? 0);
+    $title ='Agenda Publica del centro de salud';
 
     // Fechas por defecto: semana actual (lunes a domingo)
-    $hoy = new DateTime();
-    $dow = (int)$hoy->format('N'); // 1=Mon..7=Sun
-    $monday = (clone $hoy)->modify('-'.($dow-1).' day');
+    $week = $_GET['week'] ?? '';
+    if ($week && preg_match('/^\d{4}-\d{2}-\d{2}$/', $week)) {
+        $monday = new DateTime($week);
+    } else {
+        $hoy = new DateTime();
+        $dow = (int)$hoy->format('N'); // 1=Lun..7=Dom
+        $monday = (clone $hoy)->modify('-'.($dow-1).' day');
+    }
+
     $sunday = (clone $monday)->modify('+6 day');
 
     $from = $_GET['from'] ?? $monday->format('Y-m-d');
     $to   = $_GET['to']   ?? $sunday->format('Y-m-d');
 
-    $citas = [];
-    if ($userId > 0) {
-        $citas = CitasModel::getAgenda($from, $to, $userId);
-    }
-    $title = 'Agenda pública';
     include VIEWS_PATH . '/agenda_publica.php';
 }
 
 /**
  * Nombre: agendaPublicaJson
- * Recibe: El id del usuario, el dia que empieza la semana, y el dia que termina.
- * Devuelve: Un Json con las citas del usuario.
+ * Recibe:El dia de la semana que empiza y el dia que termina
+ * Devuelve: Un Json con las horas del centro 
  * Descripcion: 
- *      ->Saca y guarda en un Json las citas del usuario para que el programa no tenga que hacer muchas peticiones y se sature.
+ *      ->Saca y guarda en un Json las citas del centro para que el programa no tenga que hacer muchas peticiones y se sature.
  *      ->Esto hace que la vista sea mas dinamica y que no se sature el servidor con miles de peticiones y sentencias sql.
  * 
  */
 public function agendaPublicaJson() {
-    header('Content-Type: application/json; charset=utf-8');
+     header('Content-Type: application/json; charset=utf-8');
 
-    $userId = (int)($_GET['user'] ?? 0);
-    $from = $_GET['from'] ?? date('Y-m-d');
-    $to   = $_GET['to']   ?? date('Y-m-d');
+    $from = $_GET['from'] ?? '';
+    $to   = $_GET['to'] ?? '';
 
-    if ($userId <= 0) { echo json_encode([]); return; }
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
+        echo json_encode(['occupied' => []]);
+        return;
+    }
 
-    echo json_encode(CitasModel::getAgenda($from, $to, $userId));
+    // Devuelve SOLO los slots ocupados en el rango (anónimo)
+    $occupied = CitasModel::getOcupadasCentro($from, $to);
+
+    echo json_encode(['occupied' => $occupied]);
+    return;
 }
 }

@@ -239,4 +239,28 @@ class CitasModel{
         $st -> execute([":id" => $citaId, ":u" => $usuarioId]);
         return $st->fetch(PDO::FETCH_ASSOC) ? :null;
     }
+
+
+    public static function getOcupadasCentro(string $from, string $to): array {
+    $db = DB::getInstance();
+
+    $sql = "SELECT c.fecha, s.hora AS time
+            FROM CITA c
+            JOIN SLOTS s ON s.id = c.hora
+            WHERE c.fecha BETWEEN :f AND :t
+            ORDER BY c.fecha, s.hora";
+
+    $st = $db->prepare($sql);
+    $st->execute([':f' => $from, ':t' => $to]);
+
+    $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+
+    // IMPORTANTE: aquí tenías un bug: foreach($rows as $r) no modifica
+    foreach ($rows as &$r) {
+        $r['time'] = substr($r['time'], 0, 5);
+    }
+    unset($r);
+
+    return $rows;
+}
 }

@@ -28,9 +28,12 @@ $usuarioNombre = $_SESSION['usuario_nombre'] ?? 'Usuario';
           <li class="nav-item">
             <a class="nav-link<?= $_SERVER['REQUEST_URI'] === '/citas' ? ' active' : '' ?>" href="/citas">Mis citas</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link<?= $_SERVER['REQUEST_URI'] === '/agenda-publica' ? ' active' : '' ?>" href="/agenda-publica">Agenda publica</a>
+          </li>
         <?php else: ?>
           <li class="nav-item">
-            <a class="nav-link<?= $_SERVER['REQUEST_URI'] === '/buscar' ? ' active' : '' ?>" href="/buscar">Buscar citas</a>
+            <a class="nav-link<?= $_SERVER['REQUEST_URI'] === '/agenda-publica' ? ' active' : '' ?>" href="/agenda-publica">Agenda publica</a>
           </li>
         <?php endif; ?>
       </ul>
