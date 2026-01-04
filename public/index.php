@@ -16,6 +16,20 @@ function requireLogin(){
         exit;
     }
 }
+
+function requireGuest(): void{
+    if(session_status() === PHP_SESSION_NONE ) session_start();
+
+    if(!empty($_SESSION['usuario_id'])){
+        $_SESSION['flash'] = [
+            'tipo' => 'info',
+            'titulo' => 'Sesion ya iniciada',
+            'mensaje' => 'Ya has iniciado sesion. Para cambiar de cuenta o registrar una nueva, primero debe cerrar sesion.'
+        ];
+        header('Location: /agenda', true, 303);
+        exit; 
+    }
+}
 $uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
 switch($uri){
@@ -25,11 +39,13 @@ switch($uri){
         break;
     case '/login':
         //Vista del login de la app
+            requireGuest();
             $controller = new AuthController();
             $controller->loginForm();
         break;
     case '/registrar':
         //Vista de la pagina de registrar de la app
+            requireGuest();
             $controller = new AuthController();
             $controller->registerForm();
         break;
