@@ -92,6 +92,11 @@ function ymdLocal(d) {
       locale: 'es',
       dateFormat: 'd/m/Y',
       minDate: 'today',
+      disable:[
+        function(date){
+          return (date.getDay() === 0 || date.getDay() === 6);
+        }
+      ],
       onChange: function(selectedDates) {
         const iso = selectedDates.length ? ymdLocal(selectedDates[0]) : '';
         document.getElementById('fechaISO').value = iso;

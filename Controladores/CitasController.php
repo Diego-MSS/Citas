@@ -93,11 +93,17 @@ public function crear() {
 
     $usuarioId = (int)$_SESSION['usuario_id'];
     $fecha = $_POST['fecha'] ?? '';
-    $slotId    = isset($_POST['slot_id']) ? (int)$_POST['slot_id'] : 0;
-    $asunto= trim($_POST['asunto'] ?? '');
+    $slotId = isset($_POST['slot_id']) ? (int)$_POST['slot_id'] : 0;
+    $asunto = trim($_POST['asunto'] ?? '');
     $errores = [];
+    $dt = DateTime::createFromFormat('Y-m-d', $fecha);
 
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) $errores[] = 'Fecha inválida';
+    if(!dt){
+      $errores[] = 'Fecha invalida' ;
+    }else{
+      $dow = (int)$dt->format('N'); // 1=Lun ... 6=Sáb 7=Dom
+      if ($dow >= 6) $errores[] = 'No se pueden reservar citas en fin de semana';
+    }
     if ($slotId <= 0) $errores[] = 'Hora inválida';
     if ($asunto === '') $errores[] = 'Asunto requerido';
 
@@ -112,7 +118,7 @@ public function crear() {
             'titulo' => 'Error al crear la cita',
             'mensaje' => implode('<br>', $errores)
           ];
-          header('Location: /citas'); exit;
+          header('Location: /citas', true, 303); exit;
     }
 
     // Insertar cita
@@ -124,7 +130,7 @@ public function crear() {
       'mensaje' => 'Tu cita se ha registrado correctamente.'
     ];
 
-    header('Location: /citas'); exit;
+    header('Location: /citas',true, 303); exit;
   }
 
   /**
