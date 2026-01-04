@@ -157,24 +157,5 @@ class AuthController{
 
     $title = 'Login';
     include VIEWS_PATH . '/login.php';
-}
-    
-    /**
-     * Nombre: buscarUsuario()
-     * Recibe: Mediante el formulario de busqueda de usuarios, recibe el nombre del usuario a buscar.
-     * Devuelve: Nada.
-     * Descripcion:
-     *      ->Recibe el nombre a buscar,
-     *      ->Lanza la consulta con el nombre 
-     *      ->Muestra los resultados en la vista.
-     */
-    public function buscarUsuario(){
-        $title = "Buscar Usuario";
-        $q = trim($_GET['q'] ?? '');
-        $resultados = [];
-        if($q !== ''){
-            $resultados = UsersModel::buscar($q);
-        }
-        include VIEWS_PATH . '/buscar.php';
     }
 }

@@ -109,10 +109,6 @@ switch($uri){
             exit;
         }
         break;
-    case '/buscar':
-        $controller = new AuthController();
-        $controller -> buscarUsuario();
-        break;
     case '/agenda-publica':
         $controller = new CitasController();
         $controller -> agendaPublica();
