@@ -35,6 +35,12 @@ $uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 switch($uri){
     case'/':
         //Vista de la pagina principal, como se hace ya que no necesito ningun controlador para hacer una landing page
+
+        if(!empty($_SESSION['usuario_id'])){
+            header('Location: /agenda', true, 303);
+            exit;
+        }
+
         require VIEWS_PATH. '/landing.php';
         break;
     case '/login':
