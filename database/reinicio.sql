@@ -1,6 +1,9 @@
 set names utf8mb4;
+set FOREIGN_KEY_CHECKS = 0;
 
-CREATE DATABASE citas;
+DROP TABLE IF EXISTS CITA;
+DROP TABLE IF EXISTS USUARIO;
+DROP TABLE IF EXISTS SLOTS;
 
 Create table USUARIO( 
 id int auto_increment primary key, 
